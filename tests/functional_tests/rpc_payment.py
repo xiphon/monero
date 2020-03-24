@@ -45,6 +45,7 @@ class RPCPaymentTest():
         assert len(self.make_test_signature) > 0
         self.secret_key, self.public_key = self.get_keys()
         self.signatures = []
+        self.stale_threshold = 15
         self.reset()
         self.test_access_tracking()
         self.test_access_mining()
@@ -170,7 +171,7 @@ class RPCPaymentTest():
             assert nonce < 1000 # can't find both valid and invalid -> the RPC probably fails
             last_credits = res.credits
 
-            if time.time() >= loop_time + 10:
+            if time.time() >= loop_time + self.stale_threshold:
                 res = daemon.rpc_access_info(client = self.get_signature())
                 cookie = res.cookie
                 loop_time = time.time()
@@ -206,7 +207,7 @@ class RPCPaymentTest():
             except:
                 found_invalid += 1
             assert nonce < 1000 # can't find a valid none -> the RPC probably fails
-            if time.time() >= loop_time + 10:
+            if time.time() >= loop_time + self.stale_threshold:
                 res = daemon.rpc_access_info(client = self.get_signature())
                 cookie = res.cookie
                 loop_time = time.time()
@@ -243,7 +244,7 @@ class RPCPaymentTest():
                 found_invalid += 1
             assert nonce < 1000 # can't find both valid and invalid -> the RPC probably fails
 
-            if time.time() >= loop_time + 10:
+            if time.time() >= loop_time + self.stale_threshold:
                 res = daemon.rpc_access_info(client = self.get_signature())
                 cookie = res.cookie
                 loop_time = time.time()
@@ -294,7 +295,7 @@ class RPCPaymentTest():
                     found_invalid += 1
             assert nonce < 1000 # can't find both valid and invalid -> the RPC probably fails
 
-            if time.time() >= loop_time + 10:
+            if time.time() >= loop_time + self.stale_threshold:
                 res = daemon.rpc_access_info(client = self.get_signature())
                 # cookie = res.cookie # let the daemon update its timestamp, but use old cookie
                 loop_time = time.time()
